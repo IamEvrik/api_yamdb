@@ -27,3 +27,7 @@ class User(AbstractUser):
         choices=USER_ROLES_CHOICES,
         default='user',
     )
+    email = models.EmailField(
+        verbose_name='email',
+        max_length=254,
+    )

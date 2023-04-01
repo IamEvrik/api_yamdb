@@ -1,7 +1,7 @@
 """View и viewsets для приложения."""
 
-from rest_framework import (filters, mixins, permissions, response, status, views,
-                            viewsets)
+from rest_framework import (filters, mixins, permissions, response, status,
+                            views, viewsets)
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -10,11 +10,11 @@ from django.core import exceptions
 from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
-from api.permissions import UserIsAdmin, IsAdminOrReadOnly
-from api.serializers import (UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer, CategoriesSerializer, 
-                             GenresSerializer)
-from reviews.models import User, Categories, Genres
+from api.permissions import IsAdminOrReadOnly, UserIsAdmin
+from api.serializers import (CategoriesSerializer, GenresSerializer,
+                             UserRegistrationSerializer, UserSerializer,
+                             UserTokenSerializer)
+from reviews.models import Categories, Genres, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -114,7 +114,7 @@ class CustomizeViewSet(mixins.CreateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.ListModelMixin,
                        viewsets.GenericViewSet):
-    """Кастомизированный вьюсет только на просмотр, создание и удаление"""
+    """Кастомизированный вьюсет только на просмотр, создание и удаление."""
 
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -124,13 +124,13 @@ class CustomizeViewSet(mixins.CreateModelMixin,
 
 class CategoriesViewSet(CustomizeViewSet):
     """Вьюсет для категорий."""
-    
+
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
 
 
 class GenresViewSet(CustomizeViewSet):
     """Вьюсет для жанров."""
-    
+
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer

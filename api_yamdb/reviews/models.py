@@ -2,10 +2,10 @@
 
 from typing import Tuple
 
-from django.core.validators import RegexValidator
 from typing_extensions import Final
 
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,7 +13,7 @@ from reviews.validators import valid_username_not_me
 
 
 class BaseModelGenreCategorie(models.Model):
-    """Базовая модель для жанров и категорий"""
+    """Базовая модель для жанров и категорий."""
 
     name = models.CharField(
         max_length=256,
@@ -79,7 +79,7 @@ class User(AbstractUser):
     @property
     def is_admin(self) -> bool:
         """Является ли пользователь администратором."""
-        return self.role == User.ADMIN
+        return self.role == User.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self) -> bool:
@@ -88,14 +88,14 @@ class User(AbstractUser):
 
 
 class Categories(BaseModelGenreCategorie):
-    """Модель категории"""
+    """Модель категории."""
 
     class Meta:
-        verbose_name = 'Категории'
+        verbose_name = _('Category')
 
 
 class Genres(BaseModelGenreCategorie):
-    """Модель жанры"""
+    """Модель жанры."""
 
     class Meta:
-        verbose_name = 'Жанры'
+        verbose_name = _('Genre')

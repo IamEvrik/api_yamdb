@@ -58,3 +58,24 @@ class Categories(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Genres(models.Model):
+    """Модель жанры"""
+
+    name = models.CharField(
+        max_length=256
+    )
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex='^[-a-zA-Z0-9_]+$',
+                message='Slug doesnt comply',
+            ),
+        ]
+    )
+
+    def __str__(self):
+        return self.name

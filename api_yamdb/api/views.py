@@ -1,7 +1,8 @@
 """View и viewsets для приложения."""
 
-from rest_framework import (filters, pagination, permissions, response, status,
-                            views, viewsets)
+from rest_framework import (filters, generics, mixins, permissions, response,
+                            status, views, viewsets)
+from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.contrib.auth.tokens import default_token_generator
@@ -19,10 +20,24 @@ class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
 
     queryset = User.objects.all()
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (UserIsAdmin,)
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    lookup_field = 'username'
+
+    @action(methods=['get', 'patch'], detail=False, permission_classes=(permissions.IsAuthenticated,))
+    def me(self, request):
+        user = get_object_or_404(User, username=request.user)
+        serializer = self.get_serializer(user)
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(user, data=request.data)
+            if serializer.is_valid():
+                serializer.validated_data['role'] = user.role
+                serializer.save(user=user)
+                return response.Response(serializer.data)
+            return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(serializer.data)
 
 
 class UserRegistrationViewSet(views.APIView):

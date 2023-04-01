@@ -1,7 +1,7 @@
 """View и viewsets для приложения."""
 
-from rest_framework import (filters, generics, mixins, permissions, response,
-                            status, views, viewsets)
+from rest_framework import (filters, permissions, response, status, views,
+                            viewsets)
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -25,18 +25,31 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
+    http_method_names = ('get', 'patch', 'delete', 'post')
 
-    @action(methods=['get', 'patch'], detail=False, permission_classes=(permissions.IsAuthenticated,))
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,)
+    )
     def me(self, request):
+        """Ответ на /me/."""
         user = get_object_or_404(User, username=request.user)
         serializer = self.get_serializer(user)
         if request.method == 'PATCH':
-            serializer = self.get_serializer(user, data=request.data)
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=True
+            )
             if serializer.is_valid():
                 serializer.validated_data['role'] = user.role
                 serializer.save(user=user)
                 return response.Response(serializer.data)
-            return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return response.Response(serializer.data)
 
 
@@ -46,37 +59,38 @@ class UserRegistrationViewSet(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        """При создании нового пользователя отправляем код подтверждения на почту."""
+        """Отправляем код подтверждения на почту."""
         try:
-            new_user = User.objects.get(
+            user = User.objects.get(
                 username=request.data.get('username'),
                 email=request.data.get('email')
             )
         except exceptions.ObjectDoesNotExist:
             serializer = UserRegistrationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            new_user = serializer.save()
-        confirm_code = default_token_generator.make_token(new_user)
+            user = serializer.save()
+        confirm_code = default_token_generator.make_token(user)
         message = EmailMessage(
             subject='YamDB confirmation code',
-            body=f'confirmation code for {new_user.username} is {confirm_code}',
+            body=f'confirmation code for {user.username} is {confirm_code}',
             from_email='yamdb@no    reply.com',
             to=(request.data['email'],),
-                
         )
         message.send(fail_silently=True)
         response_text = {
-            'username': new_user.username,
-            'email': new_user.email
+            'username': user.username,
+            'email': user.email
         }
         return response.Response(response_text, status=status.HTTP_200_OK)
 
 
 class UserGetToken(views.APIView):
     """Выдача токена пользователю."""
+
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
+        """Генерация токена доступа."""
         serializer = UserTokenSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data.get('username')
@@ -89,5 +103,7 @@ class UserGetToken(views.APIView):
                 {'error': 'invalid code'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+        return response.Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -1,6 +1,6 @@
 """View и viewsets для приложения."""
 
-from rest_framework import (filters, permissions, response, status, views,
+from rest_framework import (filters, mixins, permissions, response, status, views,
                             viewsets)
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -10,10 +10,11 @@ from django.core import exceptions
 from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
-from api.permissions import UserIsAdmin
+from api.permissions import UserIsAdmin, IsAdminOrReadOnly
 from api.serializers import (UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer)
-from reviews.models import User
+                             UserTokenSerializer, CategoriesSerializer, 
+                             GenresSerializer)
+from reviews.models import User, Categories, Genres
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -107,3 +108,30 @@ class UserGetToken(views.APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class CustomizeViewSet(mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       mixins.ListModelMixin,
+                       viewsets.GenericViewSet):
+    """Кастомизированный вьюсет только на просмотр, создание и удаление"""
+
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    lookup_field = 'slug'
+    search_fields = ('name',)
+
+
+class CategoriesViewSet(CustomizeViewSet):
+    """Вьюсет для категорий."""
+    
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+
+
+class GenresViewSet(CustomizeViewSet):
+    """Вьюсет для жанров."""
+    
+    queryset = Genres.objects.all()
+    serializer_class = GenresSerializer

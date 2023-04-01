@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from reviews.models import User
+from reviews.models import User, Categories, Genres
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,4 +29,18 @@ class UserTokenSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
 
     class Meta:
-        fields = ('username', 'confirmation_code')
+        fields = ('username', 'co
+
+
+class CategoriesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Categories
+
+
+class GenresSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genres

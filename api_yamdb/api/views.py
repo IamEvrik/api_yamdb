@@ -117,7 +117,6 @@ class CustomizeViewSet(mixins.CreateModelMixin,
     """Кастомизированный вьюсет только на просмотр, создание и удаление"""
 
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     lookup_field = 'slug'
     search_fields = ('name',)

@@ -29,7 +29,7 @@ class UserTokenSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
 
     class Meta:
-        fields = ('username', 'co
+        fields = ('username', 'confirmation_code')
 
 
 class CategoriesSerializer(serializers.ModelSerializer):

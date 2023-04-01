@@ -4,10 +4,37 @@
 
 from typing import Tuple
 
+from django.core.validators import RegexValidator
 from typing_extensions import Final
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+class BaseModelGenreCategorie(models.Model):
+    """Базовая модель для жанров и категорий"""
+
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex='^[-a-zA-Z0-9_]+$',
+                message='Slug doesnt comply',
+            ),
+        ],
+        verbose_name='slug'
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
 
 
 class User(AbstractUser):
@@ -36,3 +63,17 @@ class User(AbstractUser):
         verbose_name='email',
         max_length=254,
     )
+
+
+class Categories(BaseModelGenreCategorie):
+    """Модель категории"""
+
+    class Meta:
+        verbose_name = 'Категории'
+
+
+class Genres(BaseModelGenreCategorie):
+    """Модель жанры"""
+
+    class Meta:
+        verbose_name = 'Жанры'

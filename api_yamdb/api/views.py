@@ -10,7 +10,6 @@ class CustomizeViewSet(mixins.CreateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.ListModelMixin,
                        viewsets.GenericViewSet):
-
     """Кастомизированный вьюсет только на просмотр, создание и удаление"""
 
     permission_classes = (IsAdminOrReadOnly,)

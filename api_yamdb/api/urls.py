@@ -1,14 +1,21 @@
-from django.urls import path, include
+"""URL для API."""
+
 from rest_framework import routers
 
-from .views import CategoriesViewSet, GenresViewSet
+from django.urls import include, path
+
+from api.views import (UserGetToken, UserRegistrationViewSet, UserViewSet, 
+                       CategoriesViewSet, GenresViewSet)
 
 app_name = 'api'
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter()
+router.register(r'users', UserViewSet)
 router.register(r'categories', CategoriesViewSet, basename='categories')
 router.register(r'genres', GenresViewSet, basename='genres')
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
+    path('', include(router.urls), name='users'),
+    path('auth/signup/', UserRegistrationViewSet.as_view()),
+    path('auth/token/', UserGetToken.as_view()),
 ]

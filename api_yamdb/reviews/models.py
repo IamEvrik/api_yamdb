@@ -40,7 +40,7 @@ class User(AbstractUser):
 
 
 class Categories(models.Model):
-    """Модель жанры"""
+    """Модель категории"""
 
     name = models.CharField(
         max_length=256

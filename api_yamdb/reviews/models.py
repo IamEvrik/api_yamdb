@@ -77,6 +77,9 @@ class User(AbstractUser):
     )
     password = models.CharField(_('password'), max_length=128, blank=True)
 
+    class Meta:
+        ordering = ('pk',)
+
     @property
     def is_admin(self) -> bool:
         """Является ли пользователь администратором."""

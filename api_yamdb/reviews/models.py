@@ -9,11 +9,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from reviews.validators import valid_username_not_me
+from reviews.validators import valid_username_not_me, valid_titles_year
 
 
 class BaseModelGenreCategorie(models.Model):
-    """Базовая модель для жанров и категорий"""
+    """Базовая модель для жанров и категорий."""
 
     name = models.CharField(
         max_length=256,
@@ -36,6 +36,7 @@ class BaseModelGenreCategorie(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('id',)
 
 
 class User(AbstractUser):
@@ -88,14 +89,44 @@ class User(AbstractUser):
 
 
 class Categories(BaseModelGenreCategorie):
-    """Модель категории"""
+    """Модель категории."""
 
-    class Meta:
+    class Meta(BaseModelGenreCategorie.Meta):
         verbose_name = 'Категории'
 
 
 class Genres(BaseModelGenreCategorie):
-    """Модель жанры"""
+    """Модель жанры."""
 
-    class Meta:
+    class Meta(BaseModelGenreCategorie.Meta):
         verbose_name = 'Жанры'
+
+
+class Titles(models.Model):
+    """Модель произведения."""
+
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название'
+    )
+    year = models.IntegerField(
+        verbose_name='Год выпуска',
+        validators=(valid_titles_year,)
+    )
+    description = models.TextField(
+        verbose_name='Описание',
+        blank=True
+    )
+    genre = models.ManyToManyField(
+        Genres,
+        verbose_name='Slug жанра'
+    )
+    category = models.ForeignKey(
+        Categories,
+        related_name='titles',
+        verbose_name='Slug категории',
+        on_delete=models.DO_NOTHING
+    )
+
+    class Meta(BaseModelGenreCategorie.Meta):
+        verbose_name = 'Произведения'

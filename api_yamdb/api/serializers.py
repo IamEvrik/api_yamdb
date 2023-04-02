@@ -1,8 +1,9 @@
 """Сериализаторы для приложения."""
 
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Categories, Genres, User
+from reviews.models import Categories, Genres, Titles, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,3 +47,29 @@ class GenresSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
         model = Genres
+
+
+class CategoryAtTitleSerializer(serializers.SlugRelatedField):
+    def to_representation(self, obj):
+        serializer = CategoriesSerializer(obj)
+        return serializer.data
+
+
+class GenreAtTitleSerializer(serializers.SlugRelatedField):
+    def to_representation(self, obj):
+        serializer = GenresSerializer(obj)
+        return serializer.data
+
+
+class TitlesSerializer(serializers.ModelSerializer):
+    """Сериализаторы для произведений."""
+
+    genre = GenreAtTitleSerializer(slug_field='slug', many=True,
+                                   queryset=Genres.objects.all())
+    category = CategoryAtTitleSerializer(slug_field='slug', many=False,
+                                         queryset=Categories.objects.all())
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre',
+                  'category')
+        model = Titles

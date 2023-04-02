@@ -9,7 +9,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_filters',
     'reviews',
     'api',
 ]
@@ -39,7 +39,7 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR,],
+        'DIRS': [TEMPLATES_DIR, ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -53,7 +53,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
-
 
 DATABASES = {
     'default': {
@@ -101,7 +100,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 STATIC_URL = '/static/'
 

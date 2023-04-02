@@ -1,5 +1,6 @@
 """View и viewsets для приложения."""
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, permissions, response, status,
                             views, viewsets)
 from rest_framework.decorators import action
@@ -10,11 +11,13 @@ from django.core import exceptions
 from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
+
+from api_yamdb.filters import TitleFilter
 from api.permissions import IsAdminOrReadOnly, UserIsAdmin
-from api.serializers import (CategoriesSerializer, GenresSerializer,
+from api.serializers import (CategoriesSerializer, GenresSerializer, TitlesSerializer,
                              UserRegistrationSerializer, UserSerializer,
                              UserTokenSerializer)
-from reviews.models import Categories, Genres, User
+from reviews.models import Categories, Genres, Titles, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -134,3 +137,13 @@ class GenresViewSet(CustomizeViewSet):
 
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
+
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter

@@ -13,8 +13,8 @@ from django.shortcuts import get_object_or_404
 from api.permissions import IsAdminOrReadOnly, UserIsAdmin
 from api.serializers import (CategoriesSerializer, GenresSerializer,
                              UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer)
-from reviews.models import Categories, Genres, User
+                             UserTokenSerializer, CommentSerializer)
+from reviews.models import Categories, Genres, User, Title, Review, Comment
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -134,3 +134,23 @@ class GenresViewSet(CustomizeViewSet):
 
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментариев."""
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id, title=title)
+        serializer.save(author=self.request.user, review=review)
+
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id, title=title)
+        return Comment.objects.filter(review=review)

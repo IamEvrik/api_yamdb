@@ -88,16 +88,16 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для обзоров."""
-    
+
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),
         read_only=True,
         slug_field='username'
     )
-    title = serializers.HiddenField()
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
+        read_only_fields = ('title',)
         model = Review
         validators = [
             UniqueTogetherValidator(

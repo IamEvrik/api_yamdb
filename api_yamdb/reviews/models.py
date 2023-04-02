@@ -1,9 +1,12 @@
 """Модели для приложения reviews."""
 
 from typing import Tuple
+
 from typing_extensions import Final
+
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -131,17 +134,17 @@ class Titles(models.Model):
     class Meta(BaseModelGenreCategorie.Meta):
         verbose_name = 'Произведения'
         default_related_name = 'titles'
-        
-        
- class Review(models.Model):
+
+
+class Review(models.Model):
     """Отзывы."""
-    
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         verbose_name='Автор'
     )
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE,
+        Titles, on_delete=models.CASCADE,
         verbose_name='Произведение'
     )
     text = models.TextField(
@@ -162,9 +165,9 @@ class Titles(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
-        verbose_name = "Отзыв"
-        verbose_name_plural = "Отзывы"
-        default_related_name='reviews'
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        default_related_name = 'reviews'
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'],

@@ -1,6 +1,3 @@
-
-
-=======
 """View и viewsets для приложения."""
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,11 +12,12 @@ from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
 from api.permissions import IsAdmin, IsAdminOrReadOnly
-from api.serializers import (CategoriesSerializer, GenresSerializer, ReviewSerializer,
-                             TitlesSerializer, UserRegistrationSerializer,
-                             UserSerializer, UserTokenSerializer)
+from api.serializers import (CategoriesSerializer, GenresSerializer,
+                             ReviewSerializer, TitlesSerializer,
+                             UserRegistrationSerializer, UserSerializer,
+                             UserTokenSerializer)
 from api_yamdb.filters import TitleFilter
-from reviews.models import Categories, Genres, Review, Titles, User
+from reviews.models import Categories, Genres, Titles, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -150,20 +148,20 @@ class TitlesViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для обзоров.'''
-    
+    """Вьюсет для обзоров."""
+
     serializer_class = ReviewSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
+        title = get_object_or_404(Titles, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
+        title = get_object_or_404(Titles, id=title_id)
         return title.reviews.select_related('author')

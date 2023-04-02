@@ -8,8 +8,7 @@ class UserIsAdmin(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Проверка доступа к списку."""
-        return (request.user.is_authenticated
-                and (request.user.is_admin or request.user.is_superuser))
+        return request.user.is_authenticated and request.user.is_admin
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -17,9 +16,13 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     администратором."""
 
     def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS or (
-                request.user.is_authenticated and request.user.is_admin)
-
+        """Проверка прав на доступ к списку и на создание."""
+        return (
+            request.method in permissions.SAFE_METHODS
+            or (request.user.is_authenticated and request.user.is_admin)
+        )
+        
     def has_object_permission(self, request, view, obj):
-        return request.method in permissions.SAFE_METHODS or (
-            request.user.is_admin)
+        return (
+            request.method in permissions.SAFE_METHODS or request.user.is_admin
+        )

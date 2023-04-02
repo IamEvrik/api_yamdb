@@ -1,8 +1,8 @@
 """View и viewsets для приложения."""
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, permissions, response, status,
-                            views,
-                            viewsets)
+                            views, viewsets)
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -11,12 +11,13 @@ from django.core import exceptions
 from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
+
 from api_yamdb.filters import TitleFilter
-from api.permissions import UserIsAdmin, IsAdminOrReadOnly
-from api.serializers import (UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer, CategoriesSerializer,
-                             GenresSerializer, TitlesSerializer)
-from reviews.models import User, Categories, Genres, Titles
+from api.permissions import IsAdminOrReadOnly, UserIsAdmin
+from api.serializers import (CategoriesSerializer, GenresSerializer, TitlesSerializer,
+                             UserRegistrationSerializer, UserSerializer,
+                             UserTokenSerializer)
+from reviews.models import Categories, Genres, Titles, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -116,7 +117,7 @@ class CustomizeViewSet(mixins.CreateModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.ListModelMixin,
                        viewsets.GenericViewSet):
-    """Кастомизированный вьюсет только на просмотр, создание и удаление"""
+    """Кастомизированный вьюсет только на просмотр, создание и удаление."""
 
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)

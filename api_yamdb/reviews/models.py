@@ -9,7 +9,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from reviews.validators import valid_username_not_me, valid_titles_year
+from reviews.validators import valid_titles_year, valid_username_not_me
 
 
 class BaseModelGenreCategorie(models.Model):
@@ -95,7 +95,6 @@ class Categories(BaseModelGenreCategorie):
         verbose_name = 'Категории'
 
 
-
 class Genres(BaseModelGenreCategorie):
     """Модель жанры."""
 
@@ -124,10 +123,10 @@ class Titles(models.Model):
     )
     category = models.ForeignKey(
         Categories,
-        related_name='titles',
         verbose_name='Slug категории',
         on_delete=models.DO_NOTHING
     )
 
     class Meta(BaseModelGenreCategorie.Meta):
         verbose_name = 'Произведения'
+        default_related_name = 'titles'

@@ -11,12 +11,11 @@ from django.core import exceptions
 from django.core.mail.message import EmailMessage
 from django.shortcuts import get_object_or_404
 
-
+from api.permissions import IsAdmin, IsAdminOrReadOnly
+from api.serializers import (CategoriesSerializer, GenresSerializer,
+                             TitlesSerializer, UserRegistrationSerializer,
+                             UserSerializer, UserTokenSerializer)
 from api_yamdb.filters import TitleFilter
-from api.permissions import IsAdminOrReadOnly, UserIsAdmin
-from api.serializers import (CategoriesSerializer, GenresSerializer, TitlesSerializer,
-                             UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer)
 from reviews.models import Categories, Genres, Titles, User
 
 
@@ -24,7 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
 
     queryset = User.objects.all()
-    permission_classes = (UserIsAdmin,)
+    permission_classes = (IsAdmin,)
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -142,7 +141,8 @@ class GenresViewSet(CustomizeViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Titles.objects.all()
+    queryset = Titles.objects.select_related('category').prefetch_related(
+        'genre')
     serializer_class = TitlesSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)

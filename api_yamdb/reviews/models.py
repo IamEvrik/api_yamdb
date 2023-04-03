@@ -123,7 +123,8 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genres,
-        verbose_name='Slug жанра'
+        verbose_name='Slug жанра',
+        through='TitleGenre'
     )
     category = models.ForeignKey(
         Categories,
@@ -131,9 +132,17 @@ class Title(models.Model):
         on_delete=models.DO_NOTHING
     )
 
-    class Meta(BaseModelGenreCategorie.Meta):
+    class Meta():
+        ordering = ('name',)
         verbose_name = 'Произведения'
         default_related_name = 'titles'
+
+
+class TitleGenre(models.Model):
+    """Связь между произведениями и жанрами."""
+
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
 
 
 class Review(models.Model):

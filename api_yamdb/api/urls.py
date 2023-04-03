@@ -4,9 +4,9 @@ from rest_framework import routers
 
 from django.urls import include, path
 
-from api.views import (CategoriesViewSet, GenresViewSet, ReviewViewSet,
-                       TitlesViewSet, UserGetToken, UserRegistrationViewSet,
-                       UserViewSet)
+from api.views import (CategoriesViewSet, CommentViewSet, GenresViewSet,
+                       ReviewViewSet, TitlesViewSet, UserGetToken,
+                       UserRegistrationViewSet, UserViewSet)
 
 app_name = 'api'
 
@@ -25,4 +25,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/signup/', UserRegistrationViewSet.as_view()),
     path('auth/token/', UserGetToken.as_view()),
+    router.register(
+        r'^titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+        CommentViewSet,
+        basename='comments')
 ]

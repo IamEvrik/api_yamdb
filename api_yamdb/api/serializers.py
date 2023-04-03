@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from django.shortcuts import get_object_or_404
 
-from reviews.models import Categories, Genres, Review, Title, User
+from reviews.models import Categories, Comment, Genres, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -121,3 +121,14 @@ class ReviewSerializer(serializers.ModelSerializer):
                 'Оценка может быть от 1 до 10!'
             )
         return value
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для комментариев."""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date',)
+        model = Comment

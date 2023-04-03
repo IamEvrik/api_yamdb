@@ -14,12 +14,12 @@ from django.shortcuts import get_object_or_404
 
 from api.permissions import (IsAdmin, IsAdminOrReadOnly,
                              IsAuthorAdminModeratorOrReadOnly)
-from api.serializers import (CategoriesSerializer, GenresSerializer,
-                             ReviewSerializer, TitlesSerializer,
-                             UserRegistrationSerializer, UserSerializer,
-                             UserTokenSerializer)
+from api.serializers import (CategoriesSerializer, CommentSerializer,
+                             GenresSerializer, ReviewSerializer,
+                             TitlesSerializer, UserRegistrationSerializer,
+                             UserSerializer, UserTokenSerializer)
 from api_yamdb.filters import TitleFilter
-from reviews.models import Categories, Genres, Title, User
+from reviews.models import Categories, Comment, Genres, Title, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -158,12 +158,33 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.select_related('author')
+
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментариев."""
+
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id, title=title)
+        serializer.save(author=self.request.user, review=review)
+
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
-        return title.reviews.select_related('author')
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, id=review_id, title=title)
+        return Comment.objects.filter(review=review)

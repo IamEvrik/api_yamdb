@@ -2,7 +2,7 @@
 
 import django_filters.rest_framework as dfilters
 
-from reviews.models import Titles
+from reviews.models import Title
 
 
 class CharFilterInFilter(dfilters.BaseInFilter, dfilters.CharFilter):
@@ -17,5 +17,5 @@ class TitleFilter(dfilters.FilterSet):
                                   lookup_expr='in')
 
     class Meta:
-        model = Titles
+        model = Title
         fields = ['genre', 'category', 'name', 'year']

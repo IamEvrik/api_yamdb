@@ -9,15 +9,17 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.tokens import default_token_generator
 from django.core import exceptions
 from django.core.mail.message import EmailMessage
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from api.permissions import IsAdmin, IsAdminOrReadOnly
+from api.permissions import (IsAdmin, IsAdminOrReadOnly,
+                             IsAuthorAdminModeratorOrReadOnly)
 from api.serializers import (CategoriesSerializer, GenresSerializer,
                              ReviewSerializer, TitlesSerializer,
                              UserRegistrationSerializer, UserSerializer,
                              UserTokenSerializer)
 from api_yamdb.filters import TitleFilter
-from reviews.models import Categories, Genres, Titles, User
+from reviews.models import Categories, Genres, Title, User
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -142,8 +144,8 @@ class GenresViewSet(CustomizeViewSet):
 class TitlesViewSet(viewsets.ModelViewSet):
     """Вьюсет для произведений."""
 
-    queryset = Titles.objects.select_related('category').prefetch_related(
-        'genre')
+    queryset = Title.objects.select_related('category').prefetch_related(
+        'genre').annotate(rating=Avg('reviews__score'))
     serializer_class = TitlesSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -154,14 +156,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для обзоров."""
 
     serializer_class = ReviewSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
+        title = get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user, title=title)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
+        title = get_object_or_404(Title, id=title_id)
         return title.reviews.select_related('author')

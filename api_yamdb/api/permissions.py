@@ -26,3 +26,23 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS or request.user.is_admin
         )
+
+
+class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
+    """Права на изменения для админа, модератора и автора."""
+
+    def has_permission(self, request, view):
+        """Права на доступ к списку и на создание."""
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.is_authenticated
+        )
+
+    def has_object_permission(self, request, view, obj):
+        """Права на доступ к объекту."""
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return (
+            request.user.is_admin
+            or request.user.is_moderator
+            or request.user == obj.author
+        )

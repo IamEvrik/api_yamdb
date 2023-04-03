@@ -106,7 +106,7 @@ class Genres(BaseModelGenreCategorie):
         verbose_name = 'Жанры'
 
 
-class Titles(models.Model):
+class Title(models.Model):
     """Модель произведения."""
 
     name = models.CharField(
@@ -144,7 +144,7 @@ class Review(models.Model):
         verbose_name='Автор'
     )
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE,
+        Title, on_delete=models.CASCADE,
         verbose_name='Произведение'
     )
     text = models.TextField(

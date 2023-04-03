@@ -1,9 +1,10 @@
 """Сериализаторы для приложения."""
 
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Categories, Genres, Review, Titles, User
+from django.shortcuts import get_object_or_404
+
+from reviews.models import Categories, Genres, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -78,12 +79,13 @@ class TitlesSerializer(serializers.ModelSerializer):
         many=False,
         queryset=Categories.objects.all()
     )
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
         )
-        model = Titles
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -99,16 +101,23 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date', 'title')
         read_only_fields = ('title',)
         model = Review
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('author', 'title')
-            )
-        ]
 
-    def validate(self, data):
-        if not 1 <= data['score'] <= 10:
+    def validate(self, attrs):
+        """Проверка на повторный отзыв."""
+        if self.context['request'].method == 'POST':
+            title_id = self.context['view'].kwargs.get('title_id')
+            title = get_object_or_404(Title, pk=title_id)
+            author = self.context['request'].user
+            if title.reviews.filter(author=author).exists():
+                raise serializers.ValidationError(
+                    'Вы уже оставляли отзыв на это произведение'
+                )
+        return attrs
+
+    def validate_score(self, value):
+        """Проверка оценки."""
+        if not 1 <= value <= 10:
             raise serializers.ValidationError(
                 'Оценка может быть от 1 до 10!'
             )
-        return data
+        return value

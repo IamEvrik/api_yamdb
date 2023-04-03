@@ -119,7 +119,8 @@ class Titles(models.Model):
     )
     genre = models.ManyToManyField(
         Genres,
-        verbose_name='Slug жанра'
+        verbose_name='Slug жанра',
+        through='GenreTitle'
     )
     category = models.ForeignKey(
         Categories,
@@ -130,3 +131,8 @@ class Titles(models.Model):
 
     class Meta(BaseModelGenreCategorie.Meta):
         verbose_name = 'Произведения'
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)

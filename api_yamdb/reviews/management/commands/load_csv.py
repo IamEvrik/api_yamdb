@@ -1,7 +1,6 @@
 """Загрузка информации из csv файлов."""
 
 import csv
-import pathlib
 
 from django.conf import settings
 from django.core.management import base

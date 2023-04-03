@@ -24,6 +24,7 @@ class Command(base.BaseCommand):
     }
 
     DATA_DIR = settings.STATICFILES_DIRS[0] / 'data'
+    FIELDS_FOR_ADD_ID = {'author', 'title', 'category'}
 
     def handle(self, *args, **options):
         """Загрузка."""
@@ -33,6 +34,10 @@ class Command(base.BaseCommand):
                 cur_class = Command.FILES_CLASS_MAPPING[filename]
                 with open(full_name, 'r', encoding='utf8') as csvfile:
                     reader = csv.DictReader(csvfile, delimiter=',')
+                    for field in Command.FIELDS_FOR_ADD_ID:
+                        if field in reader.fieldnames:
+                            reader.fieldnames[
+                                reader.fieldnames.index(field)] = f'{field}_id'
                     for row in reader:
                         cur_class.objects.get_or_create(**row)
                     self.stdout.write(f'file {filename} processed\n')

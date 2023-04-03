@@ -19,7 +19,7 @@ from api.serializers import (CategoriesSerializer, CommentSerializer,
                              TitlesSerializer, UserRegistrationSerializer,
                              UserSerializer, UserTokenSerializer)
 from api_yamdb.filters import TitleFilter
-from reviews.models import Categories, Comment, Genres, Title, User
+from reviews.models import Categories, Comment, Genres, Review, Title, User
 
 
 class UserViewSet(viewsets.ModelViewSet):

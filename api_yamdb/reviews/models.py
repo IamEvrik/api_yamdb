@@ -198,8 +198,8 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
-        verbose_name = "Комментарий к отзыву"
-        verbose_name_plural = "Комментарии к отзыву"
+        verbose_name = 'Комментарий к отзыву'
+        verbose_name_plural = 'Комментарии к отзыву'
         default_related_name = 'comments'
 
     def __str__(self):

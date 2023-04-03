@@ -20,13 +20,14 @@ router.register(
     ReviewViewSet,
     basename='reviews'
 )
+router.register(
+    r'^titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet,
+    basename='comments'
+)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/signup/', UserRegistrationViewSet.as_view()),
     path('auth/token/', UserGetToken.as_view()),
-    router.register(
-        r'^titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-        CommentViewSet,
-        basename='comments')
 ]

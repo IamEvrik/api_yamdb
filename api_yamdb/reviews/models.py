@@ -1,9 +1,5 @@
 """Модели для приложения reviews."""
 
-from typing import Tuple
-
-from typing_extensions import Final
-
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
@@ -43,14 +39,10 @@ class BaseModelGenreCategorie(models.Model):
 class User(AbstractUser):
     """Переопределение встроенного класса User."""
 
-    USER: Final[str] = 'user'
-    ADMIN: Final[str] = 'admin'
-    MODERATOR: Final[str] = 'moderator'
-    _USER_ROLES_CHOICES: Tuple[Tuple[str, str], ...] = (
-        (USER, 'user'),
-        (MODERATOR, 'moderator'),
-        (ADMIN, 'admin'),
-    )
+    class UserRoles(models.TextChoices):
+        ADMIN = 'admin', _('admin')
+        USER = 'user', _('user')
+        MODERATOR = 'moderator', _('moderator')
 
     username = models.CharField(
         _('username'),
@@ -68,8 +60,8 @@ class User(AbstractUser):
     role = models.CharField(
         _('role'),
         max_length=9,
-        choices=_USER_ROLES_CHOICES,
-        default=USER,
+        choices=UserRoles.choices,
+        default=UserRoles.USER,
     )
     email = models.EmailField(
         _('email address'),
@@ -84,12 +76,12 @@ class User(AbstractUser):
     @property
     def is_admin(self) -> bool:
         """Является ли пользователь администратором."""
-        return self.role == User.ADMIN or self.is_superuser
+        return self.role == User.UserRoles.ADMIN or self.is_superuser
 
     @property
     def is_moderator(self) -> bool:
         """Является ли пользователь модератором."""
-        return self.role == User.MODERATOR
+        return self.role == User.UserRoles.MODERATOR
 
 
 class Categories(BaseModelGenreCategorie):
@@ -180,7 +172,7 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'],
-                name='unique_author_review'
+                name='uq_author_review'
             )
         ]
 

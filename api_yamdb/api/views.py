@@ -18,7 +18,7 @@ from api.serializers import (CategoriesSerializer, CommentSerializer,
                              GenresSerializer, ReviewSerializer,
                              TitlesSerializer, UserRegistrationSerializer,
                              UserSerializer, UserTokenSerializer)
-from api_yamdb.filters import TitleFilter
+from reviews.filters import TitleFilter
 from reviews.models import Categories, Comment, Genres, Review, Title, User
 
 

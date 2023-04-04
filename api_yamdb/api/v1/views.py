@@ -12,13 +12,13 @@ from django.core.mail.message import EmailMessage
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
+from api.filters import TitleFilter
 from api.v1.permissions import (IsAdmin, IsAdminOrReadOnly,
                                 IsAuthorAdminModeratorOrReadOnly)
 from api.v1.serializers import (CategoriesSerializer, CommentSerializer,
                                 GenresSerializer, ReviewSerializer,
                                 TitlesSerializer, UserRegistrationSerializer,
                                 UserSerializer, UserTokenSerializer)
-from reviews.filters import TitleFilter
 from reviews.models import Categories, Comment, Genres, Review, Title, User
 
 

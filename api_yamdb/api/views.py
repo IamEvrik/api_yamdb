@@ -18,7 +18,7 @@ from api.serializers import (CategoriesSerializer, CommentSerializer,
                              GenresSerializer, ReviewSerializer,
                              TitlesSerializer, UserRegistrationSerializer,
                              UserSerializer, UserTokenSerializer)
-from api_yamdb.filters import TitleFilter
+from reviews.filters import TitleFilter
 from reviews.models import Categories, Comment, Genres, Review, Title, User
 
 
@@ -79,7 +79,6 @@ class UserRegistrationViewSet(views.APIView):
         message = EmailMessage(
             subject='YamDB confirmation code',
             body=f'confirmation code for {user.username} is {confirm_code}',
-            from_email='yamdb@no    reply.com',
             to=(request.data['email'],),
         )
         message.send(fail_silently=True)
